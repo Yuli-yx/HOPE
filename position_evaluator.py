@@ -1,5 +1,6 @@
 import numpy as np
-from models.utils import torch2numpy
+import torch
+# from models.utils import torch2numpy
 
 #  ColorHandPose3DNetwork - Network for estimating 3D Hand Pose from a single RGB Image
 #  Copyright (C) 2017  Christian Zimmermann
@@ -17,7 +18,12 @@ from models.utils import torch2numpy
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
+def torch2numpy(input):
+    if input is None:
+        return None
+    if torch.is_tensor(input):
+        input=input.detach().cpu().numpy()
+    return input
 class ZimEval:
     """ Util class for evaluation networks.
     """
@@ -129,56 +135,56 @@ class ZimEval:
         )
 
 
-def feed_evaluators_hand(evaluators, pred, gt, weights, tag, center_idx): 
-    pred_joints3d = torch2numpy(pred)
-    gt_joints3d=torch2numpy(gt)
-    weights=torch2numpy(weights)
+# def feed_evaluators_hand(evaluators, pred, gt, weights, tag, center_idx): 
+#     pred_joints3d = torch2numpy(pred)
+#     gt_joints3d=torch2numpy(gt)
+#     weights=torch2numpy(weights)
 
-    if center_idx is not None:
-        assert center_idx==0
-        gt_joints3d_cent = gt_joints3d - gt_joints3d[:, center_idx : center_idx + 1]
-        pred_joints3d_cent = pred_joints3d - pred_joints3d[:, center_idx : center_idx + 1]
+#     if center_idx is not None:
+#         assert center_idx==0
+#         gt_joints3d_cent = gt_joints3d - gt_joints3d[:, center_idx : center_idx + 1]
+#         pred_joints3d_cent = pred_joints3d - pred_joints3d[:, center_idx : center_idx + 1]
         
-        for cid in range(0,pred_joints3d.shape[0]):
-            gt_joints,pred_joints=gt_joints3d_cent[cid],pred_joints3d_cent[cid]
-            if weights[cid]>1e-4:
-                evaluators[f"{tag}joints3d_cent"].feed(gt_joints[1:,], pred_joints[1:,])
+#         for cid in range(0,pred_joints3d.shape[0]):
+#             gt_joints,pred_joints=gt_joints3d_cent[cid],pred_joints3d_cent[cid]
+#             if weights[cid]>1e-4:
+#                 evaluators[f"{tag}joints3d_cent"].feed(gt_joints[1:,], pred_joints[1:,])
     
 
-    for cid in range(0,pred_joints3d.shape[0]):
-        gt_joints,pred_joints=gt_joints3d[cid],pred_joints3d[cid]
-        if weights[cid]>1e-4:
-            evaluators[f"{tag}joints3d"].feed(gt_joints, pred_joints)
+#     for cid in range(0,pred_joints3d.shape[0]):
+#         gt_joints,pred_joints=gt_joints3d[cid],pred_joints3d[cid]
+#         if weights[cid]>1e-4:
+#             evaluators[f"{tag}joints3d"].feed(gt_joints, pred_joints)
 
 
 
 
 
 
-def parse_evaluators(evaluators, config=None):
-    """
-    Parse evaluators for which PCK curves and other statistics
-    must be computed
-    """
-    if config is None:
-        config = {"joints3d": [0, 0.08, 33],
-            "left_joints3d": [0, 0.09, 37],
-            "right_joints3d": [0, 0.09, 37],
+# def parse_evaluators(evaluators, config=None):
+#     """
+#     Parse evaluators for which PCK curves and other statistics
+#     must be computed
+#     """
+#     if config is None:
+#         config = {"joints3d": [0, 0.08, 33],
+#             "left_joints3d": [0, 0.09, 37],
+#             "right_joints3d": [0, 0.09, 37],
             
-            "left_joints3d_cent": [0, 0.05, 21],
-            "right_joints3d_cent": [0, 0.05, 21],
-            "joints3d_cent": [0, 0.05, 21],}
-    eval_results = {}
-    for evaluator_name, evaluator in evaluators.items():
-        start, end, steps = [config[evaluator_name][idx] for idx in range(3)]
-        (epe_mean, epe_mean_joints, epe_median, auc, pck_curve, thresholds) = evaluator.get_measures(start, end, steps)
-        eval_results[evaluator_name] = {
-            "epe_mean": epe_mean,
-            "epe_mean_joints": epe_mean_joints,
-            "epe_median": epe_median,
-            "auc": auc,
-            "thresholds": thresholds,
-            "pck_curve": pck_curve,
-        }
+#             "left_joints3d_cent": [0, 0.05, 21],
+#             "right_joints3d_cent": [0, 0.05, 21],
+#             "joints3d_cent": [0, 0.05, 21],}
+#     eval_results = {}
+#     for evaluator_name, evaluator in evaluators.items():
+#         start, end, steps = [config[evaluator_name][idx] for idx in range(3)]
+#         (epe_mean, epe_mean_joints, epe_median, auc, pck_curve, thresholds) = evaluator.get_measures(start, end, steps)
+#         eval_results[evaluator_name] = {
+#             "epe_mean": epe_mean,
+#             "epe_mean_joints": epe_mean_joints,
+#             "epe_median": epe_median,
+#             "auc": auc,
+#             "thresholds": thresholds,
+#             "pck_curve": pck_curve,
+#         }
         
-    return eval_results
+#     return eval_results
