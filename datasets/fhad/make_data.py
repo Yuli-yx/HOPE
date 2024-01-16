@@ -5,7 +5,7 @@ import trimesh
 
 # Loading utilities
 def load_objects(obj_root):
-    object_names = ['juice_bottle', 'liquid_soap', 'milk', 'salt']
+    object_names = ['juice', 'liquid_soap', 'milk', 'salt']
     all_models = {}
     for obj_name in object_names:
         obj_path = os.path.join(obj_root, '{}_model'.format(obj_name),
@@ -39,7 +39,7 @@ def get_obj_transform(sample, obj_root):
 
 
 # Change this path
-root = '/path/to/FHAD/hand_pose_action'
+root = '/media/mldadmin/home/s123mdg31_07/Datasets/FPHAB'
 skeleton_root = os.path.join(root, 'Hand_pose_annotation_v1')
 obj_root = os.path.join(root, 'Object_models')
 obj_trans_root = os.path.join(root, 'Object_6D_pose_annotation_v1_1')
@@ -135,14 +135,14 @@ for subject in os.listdir(obj_trans_root):
             except:
                 print('====%s, %s, %s===='%(subject, action_name, seq_idx))
 
-np.save('./images-train.npy', np.array(images_train))
-np.save('./points2d-train.npy', np.array(points2d_train))
-np.save('./points3d-train.npy', np.array(points3d_train))
+np.save('./fpha/images-train.npy', np.array(images_train))
+np.save('./fpha/points2d-train.npy', np.array(points2d_train))
+np.save('./fpha/points3d-train.npy', np.array(points3d_train))
 
-np.save('./images-val.npy', np.array(images_val))
-np.save('./points2d-val.npy', np.array(points2d_val))
-np.save('./points3d-val.npy', np.array(points3d_val))
+np.save('./fpha/images-val.npy', np.array(images_val))
+np.save('./fpha/points2d-val.npy', np.array(points2d_val))
+np.save('./fpha/points3d-val.npy', np.array(points3d_val))
 
-np.save('./images-test.npy', np.array(images_test))
-np.save('./points2d-test.npy', np.array(points2d_test))
-np.save('./points3d-test.npy', np.array(points3d_test))
+np.save('./fpha/images-test.npy', np.array(images_test))
+np.save('./fpha/points2d-test.npy', np.array(points2d_test))
+np.save('./fpha/points3d-test.npy', np.array(points3d_test))
