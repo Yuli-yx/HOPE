@@ -15,6 +15,8 @@ import torchvision.transforms as transforms
 from utils.model import select_model
 from utils.options import parse_args_function
 from utils.dataset import Dataset
+from position_evaluator import ZimEval
+import position_evaluator
 
 args = parse_args_function()
 
@@ -45,6 +47,9 @@ if args.test:
     testloader = torch.utils.data.DataLoader(testset, batch_size=args.batch_size, shuffle=False, num_workers=8)
     
     print('Test files loaded')
+
+# Create evaluator
+evaluator = ZimEval(num_kp=21)  
 
 """# Model"""
 
@@ -171,4 +176,17 @@ if args.test:
         outputs3d = model(labels2d)
         loss =  criterion(outputs3d, labels3d)
         running_loss += loss.data
-    print('test error: %.5f' % (running_loss / (i+1)))
+        # print(labels2d.shape)
+        
+        for cid in range(0, labels3d.shape[0]):
+            gt_handPTs, pred_handPTs = labels3d[cid, :21], outputs3d[cid, :21]
+            evaluator.feed(gt_handPTs, pred_handPTs)    
+            # if i == 30 and cid == 10:
+            #     print(gt_handPTs)
+        # print('test error: %.5f' % (running_loss / (i+1)))
+        
+        # print()
+    epe_mean_all, epe_mean_joint, eqe_median, auc_all, pck_curve_all, threshholds = evaluator.get_measures(0.0, 80.0, 21)
+    print(f'epe_mean_all: {epe_mean_all}, auc_all: {auc_all}, pck_curve_all: {pck_curve_all}, thresholds: {threshholds}')
+    
+    # print(epe_mean_joint)

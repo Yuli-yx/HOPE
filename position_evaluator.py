@@ -40,10 +40,10 @@ class ZimEval:
         Used to feed data to the class.
         Stores the euclidean distance between gt and pred, when it is visible.
         """
-        
+        # print("a: ", keypoint_gt.shape)
         keypoint_gt = np.squeeze(torch2numpy(keypoint_gt))
         keypoint_pred = np.squeeze(torch2numpy(keypoint_pred))
-
+        # print(keypoint_gt.shape)
         if keypoint_vis is None:
             keypoint_vis = np.ones_like(keypoint_gt[:, 0])
         keypoint_vis = np.squeeze(keypoint_vis).astype("bool")

@@ -5,7 +5,7 @@ import trimesh
 
 # Loading utilities
 def load_objects(obj_root):
-    object_names = ['juice', 'liquid_soap', 'milk', 'salt']
+    object_names = ['juice_bottle', 'liquid_soap', 'milk', 'salt']
     all_models = {}
     for obj_name in object_names:
         obj_path = os.path.join(obj_root, '{}_model'.format(obj_name),
@@ -80,6 +80,11 @@ for subject in os.listdir(obj_trans_root):
                 sset = 'val'
             elif seq_idx == '3':
                 sset = 'test'
+            # print(seq_idx)
+            # print(os.path.join(obj_trans_root, subject, action_name))
+            # print(os.listdir(os.path.join(obj_trans_root, subject, action_name)))
+            # print(os.path.join(file_root, subject, action_name, seq_idx, 'color'))
+            
             try:
                 for file_name in os.listdir(os.path.join(file_root, subject, action_name, seq_idx, 'color')):
                     frame_idx = int(file_name.split('.')[0].split('_')[1])
@@ -111,15 +116,18 @@ for subject in os.listdir(obj_trans_root):
                     verts_proj = (verts_hom2d / verts_hom2d[:, 2:])[:, :2]
                     
                     # Apply camera extrinsic to hand skeleton
-                    skel_hom = np.concatenate([skel, np.ones([skel.shape[0], 1])], 1)
-                    skel_camcoords = cam_extr.dot(skel_hom.transpose()).transpose()[:, :3].astype(np.float32)
+                    skel_hom = np.concatenate([skel, np.ones([skel.shape[0], 1])], 1)                           # (21, 4)
+                    skel_camcoords = cam_extr.dot(skel_hom.transpose()).transpose()[:, :3].astype(np.float32)   # ()
                     
                     skel_hom2d = np.array(cam_intr).dot(skel_camcoords.transpose()).transpose()
                     skel_proj = (skel_hom2d / skel_hom2d[:, 2:])[:, :2]
                 
                     points = np.concatenate((skel_camcoords, verts_camcoords))
                     projected_points = np.concatenate((skel_proj, verts_proj))
+                    print(skel_hom.shape)
+                    print(points.shape)
                     
+                    # print(sset)
                     if sset == 'train':
                         images_train.append(img_path)
                         points2d_train.append(projected_points)
@@ -134,7 +142,9 @@ for subject in os.listdir(obj_trans_root):
                         points3d_test.append(points)
             except:
                 print('====%s, %s, %s===='%(subject, action_name, seq_idx))
-
+                   
+print(len(images_train))
+print(len(images_test))
 np.save('./fpha/images-train.npy', np.array(images_train))
 np.save('./fpha/points2d-train.npy', np.array(points2d_train))
 np.save('./fpha/points3d-train.npy', np.array(points3d_train))
